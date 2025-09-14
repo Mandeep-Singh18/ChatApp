@@ -1,18 +1,11 @@
 import express from 'express';
+import { login, logout, profileUpdate, signup } from '../controllers/auth.controllers.js';
 
 const router = express.Router();
 
-router.post('/signup', ( req, res) => {
-    res.send('User signup');
-});
-router.post('/login', ( req, res) => {
-    res.send('User login');
-});
-router.post('/logout', ( req, res) => {
-    res.send('User logout');
-});
-router.put('/profile-update', ( req, res) => {
-    res.send('User profile update');
-});
+router.post('/signup', signup);
+router.post('/login', login);
+router.post('/logout', logout);
+router.put('/profile-update', profileUpdate);
 
 export default router;

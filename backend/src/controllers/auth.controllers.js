@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/user.model.js';
+import { generateToken } from '../utils/utils.js';
 
 
 export const signup = async (req, res) => {
@@ -14,7 +15,8 @@ export const signup = async (req, res) => {
             return res.status(400).json({ message: 'Password must be at least 6 characters' });
         }
 
-        if(User.findOne({ email})) {
+        const existingUser = await User.findOne({ email });
+        if( existingUser ) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
@@ -28,7 +30,7 @@ export const signup = async (req, res) => {
         })
 
         if(newUser) {
-            genrateToken(newUser._id, res);
+            generateToken(newUser._id, res);
             await newUser.save();
             res.status(201).json({
                 _id: newUser._id,

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/user.model.js';
 import { generateToken } from '../utils/utils.js';
+import cloudinary from '../lib/cloudinary.js';
 
 
 export const signup = async (req, res) => {
@@ -78,11 +79,32 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         res.cookie("jwt", "", {maxAge: 0});
-        res.status(200).json({message: 'Logout succesfully'})
+        res.status(200).json({message: 'Logout Succesfully'})
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
 }
 
-export const profileUpdate = async (req, res) => {}
+export const profileUpdate = async (req, res) => {
+    try {
+        const { profilepic } = req.body;
+        const userId = req.user._id;
+
+        if(!profilepic) {
+            return res.status(400).json({ message: 'Profile picture is required' });
+        }
+
+        const uploadResult = await cloudinary.uploader.upload(profilepic)
+        const updateUser = await User.findByIdAndUpdate(
+            userId,
+            { profilePic: uploadResult.secure_url },
+            { new: true }
+        );
+
+        res.status(200).json(updateUser);
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Server Error' });
+    }
+}
